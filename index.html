@@ -34,8 +34,29 @@
             page-break-inside: avoid;
         }
 
-        /* PDF Export Styles - Applied only during download */
-        .pdf-clean {
+        /* PDF Export Mode - Strictly structures the document for A4 in the background clone */
+        .pdf-mode {
+            background-color: white !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        
+        /* Enforce a rigid grid for PDF mode so columns never squish */
+        .pdf-mode .pdf-grid-3 {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 1rem !important;
+        }
+        .pdf-mode .pdf-grid-2 {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 1.5rem !important;
+        }
+        
+        /* Clean inputs to look like plain text in the PDF */
+        .pdf-mode input, 
+        .pdf-mode select, 
+        .pdf-mode textarea {
             -webkit-appearance: none !important;
             -moz-appearance: none !important;
             appearance: none !important;
@@ -46,16 +67,10 @@
             margin: 0 !important;
             font-weight: 700 !important;
             color: #0f172a !important;
+            resize: none !important;
         }
-        
-        /* Enforce a rigid grid for PDF mode so responsive classes don't squish */
-        .pdf-grid-3 {
-            display: grid !important;
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        }
-        .pdf-grid-2 {
-            display: grid !important;
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        .pdf-mode textarea {
+            overflow: hidden !important;
         }
     </style>
 </head>
@@ -146,7 +161,7 @@
         <!-- SCREEN 4: FORM & REPORT -->
         <div id="screen-form" class="screen">
             
-            <!-- Report Container - This specific element is converted to PDF -->
+            <!-- Report Container - This active UI form stays untouched during PDF export -->
             <div id="report-content" class="shadow-lg border border-slate-200 bg-white">
                 
                 <!-- Report Header -->
@@ -340,7 +355,8 @@
                     <button onclick="goHome()" class="px-6 py-3 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-900 flex items-center justify-center transition-colors">
                         <i data-lucide="home" class="w-5 h-5 mr-2"></i> Return Home
                     </button>
-                    <button onclick="downloadPDF()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 flex items-center justify-center shadow-md transition-colors">
+                    <!-- Added an ID here for the loading text -->
+                    <button id="btn-download" onclick="downloadPDF()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 flex items-center justify-center shadow-md transition-colors">
                         <i data-lucide="download" class="w-5 h-5 mr-2"></i> Save as PDF Report
                     </button>
                 </div>
@@ -461,84 +477,70 @@
             switchScreen('screen-form');
         }
 
-        // 5. GENERATE PDF (Fixes Applied)
+        // 5. CLONE-BASED PDF EXPORT (Bulletproof alignment)
         function downloadPDF() {
-            window.scrollTo(0, 0); // Scroll to top
+            const originalElement = document.getElementById('report-content');
             
-            const element = document.getElementById('report-content');
+            // Create a temporary, invisible wrapper sized exactly for A4 aspect ratio rendering
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = '-9999px'; // Push it safely off-screen
+            wrapper.style.top = '0';
+            wrapper.style.width = '850px'; // Lock to perfect fixed width to prevent squishing
+            wrapper.style.padding = '20px'; // Breathing room before margins
+            wrapper.style.backgroundColor = 'white';
             
-            // Save original styles to restore later
-            const originalStyles = {
-                width: element.style.width,
-                maxWidth: element.style.maxWidth,
-                margin: element.style.margin,
-                transform: element.style.transform
-            };
-
-            // FIX: Force width to prevent grid collapse, but DO NOT use absolute positioning.
-            // Keeping it in the document flow prevents the "blank page" rendering issue.
-            element.style.width = '1024px'; 
-            element.style.maxWidth = '1024px';
-            element.style.margin = '0 auto';
-            element.style.transform = 'none'; // Prevent animation transform bugs in html2canvas
-            element.classList.remove('shadow-lg'); 
-
-            // Prepare inputs for clean printing
-            const inputs = element.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                // Lock values so the PDF engine sees them
-                if (input.tagName === 'INPUT') input.setAttribute('value', input.value);
-                else if (input.tagName === 'TEXTAREA') input.innerHTML = input.value;
-                else if (input.tagName === 'SELECT') {
-                    const selected = input.options[input.selectedIndex];
-                    if (selected) {
-                        Array.from(input.options).forEach(opt => opt.removeAttribute('selected'));
-                        selected.setAttribute('selected', 'selected');
-                    }
+            // Clone the report so the live UI doesn't visually break while generating
+            const element = originalElement.cloneNode(true);
+            element.id = 'report-content-pdf';
+            element.classList.add('pdf-mode'); // This triggers our strict layout CSS block
+            
+            // Sync all user inputs into the cloned template
+            const origInputs = originalElement.querySelectorAll('input, select, textarea');
+            const cloneInputs = element.querySelectorAll('input, select, textarea');
+            origInputs.forEach((orig, index) => {
+                cloneInputs[index].value = orig.value;
+                if (orig.tagName === 'SELECT') {
+                    cloneInputs[index].selectedIndex = orig.selectedIndex;
                 }
-                
-                // Add the clean styling class
-                input.classList.add('pdf-clean');
-                if(input.tagName === 'TEXTAREA') input.style.resize = 'none';
             });
 
-            document.getElementById('action-buttons').style.display = 'none';
+            // Put clone into wrapper, then put wrapper into the invisible area of the document
+            wrapper.appendChild(element);
+            document.body.appendChild(wrapper);
 
+            // Give visual feedback on the button
+            const btn = document.getElementById('btn-download');
+            const originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 mr-2 animate-spin"></i> Generating...`;
+            if (window.lucide) lucide.createIcons();
+
+            // Setup perfectly-aligned A4 margins and rules
             const opt = {
-                margin:       [0.4, 0.4, 0.4, 0.4], 
+                margin:       [0.4, 0.4, 0.4, 0.4], // Uniform 0.4-inch margins on all A4 borders
                 filename:     `Report_${state.client.replace(/\s+/g, '_')}_${state.esn.replace(/[^a-zA-Z0-9]/g, '')}.pdf`,
                 image:        { type: 'jpeg', quality: 1.0 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
                     allowTaint: true,
-                    windowWidth: 1024, // Match the exact forced width
-                    scrollY: 0
+                    windowWidth: 850 // Match wrapper to guarantee it captures the whole box
                 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                // Use 'css' pagebreak to strictly follow the avoid-break classes
                 pagebreak:    { mode: 'css', avoid: '.avoid-break' } 
             };
 
-            html2pdf().set(opt).from(element).save().then(() => restoreUI())
-            .catch(err => {
+            // Generate and then safely clean up the hidden template
+            html2pdf().set(opt).from(wrapper).save().then(() => {
+                document.body.removeChild(wrapper);
+                btn.innerHTML = originalBtnHtml;
+                if (window.lucide) lucide.createIcons();
+            }).catch(err => {
                 console.error("PDF Gen Error:", err);
-                restoreUI();
+                document.body.removeChild(wrapper);
+                btn.innerHTML = originalBtnHtml;
+                if (window.lucide) lucide.createIcons();
             });
-
-            function restoreUI() {
-                document.getElementById('action-buttons').style.display = 'flex';
-                
-                // Restore original container layout
-                element.style.width = originalStyles.width;
-                element.style.maxWidth = originalStyles.maxWidth;
-                element.style.margin = originalStyles.margin;
-                element.style.transform = originalStyles.transform;
-                element.classList.add('shadow-lg');
-
-                // Restore inputs
-                inputs.forEach(input => input.classList.remove('pdf-clean'));
-            }
         }
 
         window.onload = goHome;
