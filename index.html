@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engine Maintenance Tracker</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Smooth transitions for screen changes */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .screen.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Styling specifically for the PDF output to ensure it looks clean */
+        #report-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+        }
+        /* Prevents awkward page breaks in the middle of sections on the PDF */
+        .avoid-break {
+            page-break-inside: avoid;
+        }
+        /* Hides the dropdown arrow purely when exporting to PDF to look like plain text */
+        select.pdf-clean {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-blue-800 text-white shadow-md p-4 sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 font-bold text-xl cursor-pointer" onclick="goHome()">
+                <!-- Company Logo Added Here -->
+                <img src="image_aefd43.png" alt="Company Logo" class="h-8 w-auto bg-white rounded p-0.5 object-contain" onerror="this.style.display='none';">
+                <span>Maintenance Portal</span>
+            </div>
+            <div id="breadcrumb" class="text-sm font-medium text-blue-200 hidden sm:block">
+                <!-- Breadcrumbs will be injected here -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl mx-auto p-4 sm:p-6 mt-4">
+
+        <!-- SCREEN 1: CLIENT SELECTION -->
+        <div id="screen-clients" class="screen active">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-slate-800 mb-2">Select a Client</h1>
+                <p class="text-slate-500">Choose a customer to view their installed engine fleet.</p>
+            </div>
+            <div id="client-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Buttons injected by JS -->
+            </div>
+        </div>
+
+        <!-- SCREEN 2: ENGINE SELECTION -->
+        <div id="screen-engines" class="screen">
+            <button onclick="goHome()" class="mb-6 flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Clients
+            </button>
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-slate-800 mb-2">Select Engine (by Serial Number)</h1>
+                <p class="text-slate-500" id="engine-subtitle">Showing all engines installed for Client.</p>
+            </div>
+            <div id="engine-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Buttons injected by JS -->
+            </div>
+        </div>
+
+        <!-- SCREEN 3: MAINTENANCE TYPE SELECTION -->
+        <div id="screen-maintenance" class="screen">
+            <button onclick="showEngines()" class="mb-6 flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Engines
+            </button>
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-slate-800 mb-2">Select Maintenance Interval</h1>
+                <p class="text-slate-500">What type of service are you performing?</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button onclick="selectMaintenance('2,000 Hours (Routine)')" class="p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-500 transition-all text-left group">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i data-lucide="clock"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">2k Hours</h3>
+                    <p class="text-sm text-slate-500 mt-1">Routine checks, filters, spark plugs.</p>
+                </button>
+                <button onclick="selectMaintenance('4,000 Hours (Top End)')" class="p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-500 transition-all text-left group">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i data-lucide="settings"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">4k Hours</h3>
+                    <p class="text-sm text-slate-500 mt-1">Top-end inspections, valve clearances.</p>
+                </button>
+                <button onclick="selectMaintenance('16,000 Hours (In-Frame)')" class="p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-500 transition-all text-left group">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i data-lucide="tool"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">16k Hours</h3>
+                    <p class="text-sm text-slate-500 mt-1">In-frame overhaul, bearings, cylinder heads.</p>
+                </button>
+                <button onclick="selectMaintenance('32,000 Hours (Major)')" class="p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-500 transition-all text-left group">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">32k Hours</h3>
+                    <p class="text-sm text-slate-500 mt-1">Major complete engine overhaul.</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: FORM & REPORT -->
+        <div id="screen-form" class="screen">
+            
+            <!-- This div is the container that will be converted to PDF -->
+            <div id="report-content" class="shadow-lg border border-slate-200 bg-white">
+                
+                <!-- Report Header -->
+                <div class="border-b-2 border-blue-800 pb-4 mb-6 flex justify-between items-end">
+                    <div class="flex items-center space-x-4">
+                        <!-- Company Logo Added to PDF Header Here -->
+                        <img src="image_aefd43.png" alt="Company Logo" class="h-16 w-auto object-contain" onerror="this.style.display='none';">
+                        <div>
+                            <h1 class="text-3xl font-black text-slate-900 uppercase tracking-wider">Service Report</h1>
+                            <p class="text-slate-500 mt-1">Maintenance & Inspection Log</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-blue-800" id="display-client">Client Name</p>
+                        <p class="text-sm text-slate-600" id="display-interval">Interval</p>
+                    </div>
+                </div>
+
+                <!-- Form Inputs -->
+                <form id="maintenance-form" class="space-y-6" onsubmit="event.preventDefault();">
+                    
+                    <!-- Section 1: General Info -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 avoid-break bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Site / Location</label>
+                            <input type="text" id="input-site" class="w-full p-1.5 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Utility</label>
+                            <select id="input-utility" class="w-full p-1.5 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                                <option>Power Gen</option>
+                                <option>Compressor</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Service Date</label>
+                            <input type="date" id="input-date" class="w-full p-1.5 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Engine Model</label>
+                            <input type="text" id="input-model" readonly class="w-full p-1.5 text-sm border border-slate-300 rounded bg-slate-100 text-slate-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Engine Serial Number</label>
+                            <input type="text" id="input-esn" readonly class="w-full p-1.5 text-sm border border-slate-300 rounded bg-slate-100 text-slate-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Running Hours</label>
+                            <input type="number" id="input-hours" placeholder="e.g. 4050" class="w-full p-1.5 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Measurements -->
+                    <div class="avoid-break border border-slate-300 rounded-lg p-4 bg-white shadow-sm">
+                        <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1 uppercase tracking-wide">Generator & Panel Measurements</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Load (KW)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Excitation Voltage (V)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Voltage (V)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">RPM</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Current L1, L2, L3</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Frequency (HZ)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Power Factor</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Load Signal</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">On/Off Load Values</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Actuator Voltage (V)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">PMG (V)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Magnetic Pickup Freq</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Ohmic Values -->
+                    <div class="avoid-break border border-slate-300 rounded-lg p-4 bg-white shadow-sm">
+                        <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1 uppercase tracking-wide">Ohmic Values</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Charging Motor</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Shunt Trip</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Control Voltage</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Closing Relay</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">CT (A, B, C)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Droop CT</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Anti Pump Relay</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Up</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Down</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Electrical Checklists -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Panel & Terminals -->
+                        <div class="avoid-break bg-white border border-slate-300 p-4 rounded-lg shadow-sm">
+                            <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1">Gen. Panel & Terminal Checks</h3>
+                            <div class="space-y-1">
+                                <!-- Reusable checklist generator -->
+                                <script>
+                                    const panelItems = ['Control Panel Inspected', 'Wiring Inspected', 'Terminal Connection', 'Field Excitor MTG Bolts', 'Gen Lead Wire Connection', 'Circuit Breaker', 'Battery Connection', 'O.V. Relay', 'R.P Relay', 'HMI', 'Bus Bars', 'Meters', 'Inst. Transformers', 'AVR', 'GCB', 'D.C. Relays / Timers', 'PLC Term', 'Sockets', 'TDXM/Advantys'];
+                                    panelItems.forEach(item => {
+                                        document.write(`
+                                        <div class="flex items-center justify-between text-xs hover:bg-slate-50 p-1 rounded border-b border-slate-50">
+                                            <span class="text-slate-700">${item}</span>
+                                            <select class="border border-slate-200 rounded p-0.5 bg-transparent w-20 text-slate-600 focus:ring-1 outline-none"><option>-</option><option>OK</option><option>Adjusted</option><option>Replaced</option><option>N/A</option></select>
+                                        </div>`);
+                                    });
+                                </script>
+                            </div>
+                        </div>
+
+                        <!-- Engine & ESM -->
+                        <div class="avoid-break bg-white border border-slate-300 p-4 rounded-lg shadow-sm">
+                            <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1">Engine & ESM Checks</h3>
+                            <div class="space-y-1">
+                                <script>
+                                    const engineItems = ['Elect. Terminal TB-6', 'Elect. Starter Term.', 'Elect. Terminal TB-7', 'Ignition Harness & Plug', 'Control Harness & Plug', 'TCM', 'Main Reg. Filter', 'Timing Disk', 'Ignition Coils Term', 'AFM', 'Starter Bearing Lub.', 'Snubber', 'Emergency Switch', 'MPU CNR / CAM', 'P.D Box Connectors', 'Knock Sensor', 'RTD', 'Actuator Harness', 'Nox / Exhaust / O2 Sensor', 'Stepper Motors', 'FCV'];
+                                    engineItems.forEach(item => {
+                                        document.write(`
+                                        <div class="flex items-center justify-between text-xs hover:bg-slate-50 p-1 rounded border-b border-slate-50">
+                                            <span class="text-slate-700">${item}</span>
+                                            <select class="border border-slate-200 rounded p-0.5 bg-transparent w-20 text-slate-600 focus:ring-1 outline-none"><option>-</option><option>OK</option><option>Adjusted</option><option>Replaced</option><option>N/A</option></select>
+                                        </div>`);
+                                    });
+                                </script>
+                            </div>
+                        </div>
+
+                        <!-- Compressor -->
+                        <div class="avoid-break bg-white border border-slate-300 p-4 rounded-lg shadow-sm">
+                            <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1">Compressor Checks</h3>
+                            <div class="space-y-1">
+                                <script>
+                                    const compItems = ['Suction P-xudcer', 'Discharge P-Xudcer', 'Comp Oil Xducer', 'Re-Cycle Value', 'Re-cycle Value PID', 'Blowdown Value', 'Suction Scrubber Level', 'Discharge Scrubber Level', 'DNFT', 'Vibration'];
+                                    compItems.forEach(item => {
+                                        document.write(`
+                                        <div class="flex items-center justify-between text-xs hover:bg-slate-50 p-1 rounded border-b border-slate-50">
+                                            <span class="text-slate-700">${item}</span>
+                                            <select class="border border-slate-200 rounded p-0.5 bg-transparent w-20 text-slate-600 focus:ring-1 outline-none"><option>-</option><option>OK</option><option>Adjusted</option><option>Replaced</option><option>N/A</option></select>
+                                        </div>`);
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="avoid-break border-t border-slate-200 pt-6">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Service Notes & Remarks</label>
+                        <textarea id="input-notes" rows="4" placeholder="Detail any issues found or parts replaced..." class="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                    </div>
+
+                    <!-- Signatures -->
+                    <div class="avoid-break grid grid-cols-2 gap-8 pt-8 mt-8 border-t border-slate-200">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-8">Lead Technician Name</label>
+                            <input type="text" class="w-full p-1 border-b border-slate-400 bg-transparent outline-none mb-2">
+                            <p class="text-xs font-semibold text-slate-500 text-center">Technician Signature</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-8">Client Rep Name</label>
+                            <input type="text" class="w-full p-1 border-b border-slate-400 bg-transparent outline-none mb-2">
+                            <p class="text-xs font-semibold text-slate-500 text-center">Client Representative</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Action Buttons (Hidden during PDF export) -->
+            <div id="action-buttons" class="mt-8 flex flex-col sm:flex-row gap-4 justify-between bg-slate-100 p-4 rounded-xl border border-slate-200">
+                <button onclick="showMaintenance()" class="px-6 py-3 bg-white text-slate-700 border border-slate-300 font-bold rounded-lg hover:bg-slate-50 flex items-center justify-center transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Go Back
+                </button>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="goHome()" class="px-6 py-3 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-900 flex items-center justify-center transition-colors">
+                        <i data-lucide="home" class="w-5 h-5 mr-2"></i> Return Home
+                    </button>
+                    <button onclick="downloadPDF()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 flex items-center justify-center shadow-md transition-colors">
+                        <i data-lucide="download" class="w-5 h-5 mr-2"></i> Save as PDF Report
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // --- DATA SETUP ---
+        // I have extracted sample data from your Excel file to make this functional immediately.
+        // You can add the rest of your fleet simply by copying this format.
+        const fleetData = [
+            // Fauji Fertilizer (extracted from your file)
+            { customer: "Fauji Fertilizer", model: "12V 275 GL + AFR2", esn: "5283704064" },
+            { customer: "Fauji Fertilizer", model: "12V 275 GL + AFR2", esn: "5283704244" },
+            { customer: "Fauji Fertilizer", model: "12V 275 GL + AFR2", esn: "5283704046" },
+            { customer: "Fauji Fertilizer", model: "16V 275 GL + AFR2", esn: "5283705317" },
+            { customer: "Fauji Fertilizer", model: "16V 275 GL + AFR2", esn: "5283705318" },
+            { customer: "Fauji Fertilizer", model: "16V 275 GL + AFR2", esn: "3189237" },
+            { customer: "Fauji Fertilizer", model: "16V 275 GL + AFR2", esn: "3189235" },
+            { customer: "Fauji Fertilizer", model: "VHP L7042 GL", esn: "C-17883/1" },
+            
+            // OGDCL (Representing multiple sites as requested)
+            { customer: "OGDCL (Nashpa)", model: "VHP L7042 GSI", esn: "OG-N-1001" },
+            { customer: "OGDCL (Nashpa)", model: "VHP L7042 GSI", esn: "OG-N-1002" },
+            { customer: "OGDCL (Qadirpur)", model: "VHP L5794 GSI", esn: "OG-Q-2001" },
+            { customer: "OGDCL (Chanda)", model: "VHP L7044 GSI", esn: "OG-C-3001" },
+
+            // MOL
+            { customer: "MOL", model: "VHP L7042 GSI", esn: "MOL-101" },
+            { customer: "MOL", model: "VHP L5794 GSI", esn: "MOL-102" },
+
+            // MARI energi
+            { customer: "MARI Energi", model: "VHP L7042 GSI", esn: "MARI-001" },
+            { customer: "MARI Energi", model: "VHP L7044 GSI", esn: "MARI-002" },
+
+            // Tariq glass
+            { customer: "Tariq Glass", model: "VHP L5794LTD", esn: "TG-5001" },
+            { customer: "Tariq Glass", model: "VHP L5794LTD", esn: "TG-5002" }
+        ];
+
+        // App State
+        let state = {
+            client: null,
+            engineModel: null,
+            esn: null,
+            interval: null
+        };
+
+        // --- UTILITY FUNCTIONS ---
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function updateBreadcrumb() {
+            let breadcrumbText = "Home";
+            if(state.client) breadcrumbText += ` > ${state.client}`;
+            if(state.esn) breadcrumbText += ` > ESN: ${state.esn}`;
+            document.getElementById('breadcrumb').innerText = breadcrumbText;
+        }
+
+        // --- NAVIGATION FUNCTIONS ---
+
+        // 1. Load Clients
+        function goHome() {
+            state = { client: null, engineModel: null, esn: null, interval: null };
+            updateBreadcrumb();
+            
+            // Get unique customers
+            const clients = [...new Set(fleetData.map(item => item.customer))].sort();
+            
+            const grid = document.getElementById('client-grid');
+            grid.innerHTML = '';
+            
+            clients.forEach(client => {
+                const btn = document.createElement('button');
+                btn.className = "p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-500 transition-all text-left group flex items-center justify-between";
+                btn.onclick = () => selectClient(client);
+                btn.innerHTML = `
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800 group-hover:text-blue-700">${client}</h3>
+                        <p class="text-sm text-slate-400 mt-1">View Fleet</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="text-slate-300 group-hover:text-blue-500"></i>
+                `;
+                grid.appendChild(btn);
+            });
+            
+            lucide.createIcons();
+            switchScreen('screen-clients');
+        }
+
+        // 2. Select Client -> Show Engines (NOW BY ESN)
+        function selectClient(clientName) {
+            state.client = clientName;
+            updateBreadcrumb();
+            document.getElementById('engine-subtitle').innerText = `Showing all engines installed at ${clientName}.`;
+            
+            // Filter data for this client to show EVERY specific engine
+            const clientEngines = fleetData.filter(item => item.customer === clientName);
+
+            const grid = document.getElementById('engine-grid');
+            grid.innerHTML = '';
+
+            clientEngines.forEach(engine => {
+                const btn = document.createElement('button');
+                btn.className = "p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-500 transition-all text-left flex flex-col space-y-3";
+                btn.onclick = () => selectEngine(engine.model, engine.esn);
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3 w-full">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-blue-600">
+                            <i data-lucide="hash" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase tracking-wider font-bold">Serial Number</p>
+                            <h3 class="font-bold text-lg text-slate-800">${engine.esn}</h3>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded border border-slate-100 text-sm">
+                        <span class="text-slate-500">Model:</span> <span class="font-semibold text-slate-700">${engine.model}</span>
+                    </div>
+                `;
+                grid.appendChild(btn);
+            });
+
+            lucide.createIcons();
+            switchScreen('screen-engines');
+        }
+        
+        function showEngines() {
+            switchScreen('screen-engines');
+        }
+
+        // 3. Select Engine -> Show Maintenance Types
+        function selectEngine(modelName, esn) {
+            state.engineModel = modelName;
+            state.esn = esn;
+            updateBreadcrumb();
+            switchScreen('screen-maintenance');
+        }
+        
+        function showMaintenance() {
+            switchScreen('screen-maintenance');
+        }
+
+        // 4. Select Maintenance -> Show Form
+        function selectMaintenance(intervalType) {
+            state.interval = intervalType;
+            
+            // Extract Site from Client Name if formatted as "Client (Site)"
+            let clientStr = state.client;
+            let siteName = "";
+            let displayName = clientStr;
+            
+            if (clientStr.includes("(")) {
+                siteName = clientStr.match(/\(([^)]+)\)/)[1];
+                displayName = clientStr.split("(")[0].trim();
+            }
+
+            // Populate Form Headers
+            document.getElementById('display-client').innerText = displayName;
+            document.getElementById('display-interval').innerText = state.interval;
+            
+            // Auto-fill Readonly inputs
+            document.getElementById('input-site').value = siteName;
+            document.getElementById('input-model').value = state.engineModel;
+            document.getElementById('input-esn').value = state.esn;
+            
+            // Set today's date automatically
+            document.getElementById('input-date').valueAsDate = new Date();
+
+            switchScreen('screen-form');
+        }
+
+        // 5. Generate PDF
+        function downloadPDF() {
+            // FIX 1: Scroll to the very top to prevent the "blank first page" bug
+            window.scrollTo(0, 0);
+
+            const element = document.getElementById('report-content');
+            
+            // NEW FIX: Force a strict desktop width on the container to prevent squished columns in PDF
+            const originalWidth = element.style.width;
+            const originalMaxWidth = element.style.maxWidth;
+            element.style.width = '1000px';
+            element.style.maxWidth = '1000px';
+            element.classList.remove('shadow-lg', 'border', 'border-slate-200'); // Remove outer borders for clean PDF background
+            
+            // Temporarily style inputs to look like plain text for the PDF
+            const inputs = element.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                
+                // FIX 2: Lock the typed/selected values into the HTML so the PDF captures them correctly
+                if (input.tagName === 'INPUT') {
+                    input.setAttribute('value', input.value);
+                } else if (input.tagName === 'TEXTAREA') {
+                    input.innerHTML = input.value;
+                } else if (input.tagName === 'SELECT') {
+                    const selected = input.options[input.selectedIndex];
+                    if (selected) {
+                        Array.from(input.options).forEach(opt => opt.removeAttribute('selected'));
+                        selected.setAttribute('selected', 'selected');
+                    }
+                }
+
+                input.dataset.originalBorder = input.style.border;
+                input.dataset.originalBg = input.style.backgroundColor;
+                
+                input.style.border = 'none';
+                input.style.backgroundColor = 'transparent';
+                
+                // For select elements, hide the dropdown arrow during PDF generation
+                if(input.tagName === 'SELECT') {
+                    input.classList.add('pdf-clean');
+                }
+                
+                if(input.tagName === 'TEXTAREA') {
+                    input.style.resize = 'none';
+                }
+            });
+
+            const opt = {
+                margin:       [0.4, 0.4, 0.4, 0.4], // Strict top, right, bottom, left margins in inches
+                filename:     `Report_${state.client.replace(/\s+/g, '_')}_${state.esn.replace(/[^a-zA-Z0-9]/g, '')}_${new Date().toISOString().split('T')[0]}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    allowTaint: true,
+                    windowWidth: 1024,
+                    scrollY: 0
+                },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                // NEW FIX: Use 'avoid-all' mode to completely prevent sections breaking in half across pages
+                pagebreak:    { mode: 'avoid-all', avoid: '.avoid-break' }
+            };
+
+            // Hide buttons
+            document.getElementById('action-buttons').style.display = 'none';
+
+            // Generate
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore UI after PDF generation
+                document.getElementById('action-buttons').style.display = 'flex';
+                
+                // Restore container layout after snapshot is done
+                element.style.width = originalWidth;
+                element.style.maxWidth = originalMaxWidth;
+                element.classList.add('shadow-lg', 'border', 'border-slate-200');
+
+                inputs.forEach(input => {
+                    input.style.border = input.dataset.originalBorder;
+                    input.style.backgroundColor = input.dataset.originalBg || '';
+                    if(input.tagName === 'SELECT') {
+                        input.classList.remove('pdf-clean');
+                    }
+                });
+            }).catch(error => {
+                // Catch any errors that happen during PDF generation to prevent unhandled rejection
+                console.error("Failed to generate PDF:", error);
+                
+                // Ensure UI is still restored if it fails
+                document.getElementById('action-buttons').style.display = 'flex';
+                element.style.width = originalWidth;
+                element.style.maxWidth = originalMaxWidth;
+                element.classList.add('shadow-lg', 'border', 'border-slate-200');
+
+                inputs.forEach(input => {
+                    input.style.border = input.dataset.originalBorder;
+                    input.style.backgroundColor = input.dataset.originalBg || '';
+                    if(input.tagName === 'SELECT') {
+                        input.classList.remove('pdf-clean');
+                    }
+                });
+            });
+        }
+
+        // Initialize App on Load
+        window.onload = goHome;
+
+    </script>
+</body>
+</html>
