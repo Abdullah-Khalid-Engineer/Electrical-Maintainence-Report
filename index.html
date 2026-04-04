@@ -34,11 +34,11 @@
             page-break-inside: avoid;
         }
 
-        /* PDF Export Mode - Strictly structures the document for A4 in the background clone */
+        /* PDF Export Mode - Cleans up the form to look like a printed document */
         .pdf-mode {
             background-color: white !important;
-            box-shadow: none !important;
             border: none !important;
+            box-shadow: none !important;
         }
         
         /* Enforce a rigid grid for PDF mode so columns never squish */
@@ -161,7 +161,7 @@
         <!-- SCREEN 4: FORM & REPORT -->
         <div id="screen-form" class="screen">
             
-            <!-- Report Container - This active UI form stays untouched during PDF export -->
+            <!-- Report Container - This active UI form is converted to PDF -->
             <div id="report-content" class="shadow-lg border border-slate-200 bg-white">
                 
                 <!-- Report Header -->
@@ -219,22 +219,22 @@
                         </div>
                         <div class="pdf-fix-grid pdf-grid-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
                             <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Load (KW)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Excitation (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Voltage (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">RPM</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Load (KW)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Excitation (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Voltage (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">RPM</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
                             </div>
                             <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Current L1,L2,L3</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Frequency (HZ)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Power Factor</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Load Signal</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Current L1,L2,L3</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Frequency (HZ)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Power Factor</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Load Signal</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
                             </div>
                             <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">On/Off Load</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Actuator (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">PMG (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Mag Pickup Freq</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">On/Off Load</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Actuator (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">PMG (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Mag Pickup Freq</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
                             </div>
                         </div>
                     </div>
@@ -246,19 +246,19 @@
                         </div>
                         <div class="pdf-fix-grid pdf-grid-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
                             <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Charging Motor</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Shunt Trip</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Control Voltage</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Charging Motor</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Shunt Trip</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Control Voltage</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
                             </div>
                             <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Closing Relay</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">CT (A, B, C)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Droop CT</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Closing Relay</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">CT (A, B, C)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Droop CT</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
                             </div>
                             <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Anti Pump Relay</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Up</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
-                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Dwn</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Anti Pump Relay</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Up</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Dwn</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
                             </div>
                         </div>
                     </div>
@@ -477,70 +477,87 @@
             switchScreen('screen-form');
         }
 
-        // 5. CLONE-BASED PDF EXPORT (Bulletproof alignment)
+        // 5. LIVE ELEMENT PDF EXPORT (Fixes Blank PDF issue)
         function downloadPDF() {
-            const originalElement = document.getElementById('report-content');
+            // Scroll to top so html2canvas doesn't clip the top of the document
+            window.scrollTo(0, 0); 
             
-            // Create a temporary, invisible wrapper sized exactly for A4 aspect ratio rendering
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'absolute';
-            wrapper.style.left = '-9999px'; // Push it safely off-screen
-            wrapper.style.top = '0';
-            wrapper.style.width = '850px'; // Lock to perfect fixed width to prevent squishing
-            wrapper.style.padding = '20px'; // Breathing room before margins
-            wrapper.style.backgroundColor = 'white';
+            const element = document.getElementById('report-content');
             
-            // Clone the report so the live UI doesn't visually break while generating
-            const element = originalElement.cloneNode(true);
-            element.id = 'report-content-pdf';
-            element.classList.add('pdf-mode'); // This triggers our strict layout CSS block
+            // Save original styles to safely restore them after export
+            const originalStyles = {
+                width: element.style.width,
+                maxWidth: element.style.maxWidth,
+                margin: element.style.margin,
+                boxShadow: element.style.boxShadow
+            };
+
+            // Force strict dimensions on the live element to perfectly align with A4 width
+            // Keeping it in the regular document flow stops the "blank PDF" bug entirely.
+            element.style.width = '800px'; 
+            element.style.maxWidth = '800px';
+            element.style.margin = '0 auto';
+            element.style.boxShadow = 'none';
+            element.classList.add('pdf-mode'); 
             
-            // Sync all user inputs into the cloned template
-            const origInputs = originalElement.querySelectorAll('input, select, textarea');
-            const cloneInputs = element.querySelectorAll('input, select, textarea');
-            origInputs.forEach((orig, index) => {
-                cloneInputs[index].value = orig.value;
-                if (orig.tagName === 'SELECT') {
-                    cloneInputs[index].selectedIndex = orig.selectedIndex;
+            // Sync all user inputs into their HTML attributes so the PDF engine can "see" them
+            const inputs = element.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.tagName === 'INPUT') {
+                    input.setAttribute('value', input.value);
+                } else if (input.tagName === 'TEXTAREA') {
+                    input.innerHTML = input.value;
+                } else if (input.tagName === 'SELECT') {
+                    const selected = input.options[input.selectedIndex];
+                    if (selected) {
+                        Array.from(input.options).forEach(opt => opt.removeAttribute('selected'));
+                        selected.setAttribute('selected', 'selected');
+                    }
                 }
             });
 
-            // Put clone into wrapper, then put wrapper into the invisible area of the document
-            wrapper.appendChild(element);
-            document.body.appendChild(wrapper);
-
-            // Give visual feedback on the button
+            // UI Feedback
             const btn = document.getElementById('btn-download');
             const originalBtnHtml = btn.innerHTML;
             btn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 mr-2 animate-spin"></i> Generating...`;
+            document.getElementById('action-buttons').style.display = 'none';
             if (window.lucide) lucide.createIcons();
 
-            // Setup perfectly-aligned A4 margins and rules
+            // Setup perfectly-aligned A4 margins
             const opt = {
-                margin:       [0.4, 0.4, 0.4, 0.4], // Uniform 0.4-inch margins on all A4 borders
+                margin:       [0.4, 0.4, 0.4, 0.4], 
                 filename:     `Report_${state.client.replace(/\s+/g, '_')}_${state.esn.replace(/[^a-zA-Z0-9]/g, '')}.pdf`,
                 image:        { type: 'jpeg', quality: 1.0 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
                     allowTaint: true,
-                    windowWidth: 850 // Match wrapper to guarantee it captures the whole box
+                    windowWidth: 800, // Explicitly match the container width so columns never squish
+                    scrollY: 0
                 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: 'css', avoid: '.avoid-break' } 
             };
 
-            // Generate and then safely clean up the hidden template
-            html2pdf().set(opt).from(wrapper).save().then(() => {
-                document.body.removeChild(wrapper);
-                btn.innerHTML = originalBtnHtml;
-                if (window.lucide) lucide.createIcons();
+            html2pdf().set(opt).from(element).save().then(() => {
+                restoreUI();
             }).catch(err => {
                 console.error("PDF Gen Error:", err);
-                document.body.removeChild(wrapper);
+                restoreUI();
+            });
+
+            function restoreUI() {
+                // Return everything to normal
+                document.getElementById('action-buttons').style.display = 'flex';
+                element.style.width = originalStyles.width;
+                element.style.maxWidth = originalStyles.maxWidth;
+                element.style.margin = originalStyles.margin;
+                element.style.boxShadow = originalStyles.boxShadow;
+                element.classList.remove('pdf-mode');
+                
                 btn.innerHTML = originalBtnHtml;
                 if (window.lucide) lucide.createIcons();
-            });
+            }
         }
 
         window.onload = goHome;
