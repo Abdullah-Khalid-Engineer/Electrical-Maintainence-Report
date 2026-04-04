@@ -11,7 +11,6 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Smooth transitions for screen changes */
         .screen {
             display: none;
             animation: fadeIn 0.3s ease-in-out;
@@ -23,22 +22,40 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* Styling specifically for the PDF output to ensure it looks clean */
+        
         #report-content {
             background-color: white;
             padding: 2rem;
             border-radius: 0.5rem;
         }
-        /* Prevents awkward page breaks in the middle of sections on the PDF */
+        
+        /* Forces sections to stay together on the same PDF page */
         .avoid-break {
             page-break-inside: avoid;
         }
-        /* Hides the dropdown arrow purely when exporting to PDF to look like plain text */
-        select.pdf-clean {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: none;
+
+        /* PDF Export Styles - Applied only during download */
+        .pdf-clean {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            background-image: none !important;
+            border: none !important;
+            background-color: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+        }
+        
+        /* Enforce a rigid grid for PDF mode so responsive classes don't squish */
+        .pdf-grid-3 {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        }
+        .pdf-grid-2 {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         }
     </style>
 </head>
@@ -48,12 +65,11 @@
     <nav class="bg-blue-800 text-white shadow-md p-4 sticky top-0 z-10">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3 font-bold text-xl cursor-pointer" onclick="goHome()">
-                <!-- Company Logo Added Here -->
+                <!-- Company Logo -->
                 <img src="image_aefd43.png" alt="Company Logo" class="h-8 w-auto bg-white rounded p-0.5 object-contain" onerror="this.style.display='none';">
                 <span>Maintenance Portal</span>
             </div>
             <div id="breadcrumb" class="text-sm font-medium text-blue-200 hidden sm:block">
-                <!-- Breadcrumbs will be injected here -->
             </div>
         </div>
     </nav>
@@ -130,173 +146,192 @@
         <!-- SCREEN 4: FORM & REPORT -->
         <div id="screen-form" class="screen">
             
-            <!-- This div is the container that will be converted to PDF -->
+            <!-- Report Container - This specific element is converted to PDF -->
             <div id="report-content" class="shadow-lg border border-slate-200 bg-white">
                 
                 <!-- Report Header -->
-                <div class="border-b-2 border-blue-800 pb-4 mb-6 flex justify-between items-end">
+                <div class="border-b-2 border-slate-800 pb-4 mb-6 flex justify-between items-end avoid-break">
                     <div class="flex items-center space-x-4">
-                        <!-- Company Logo Added to PDF Header Here -->
                         <img src="image_aefd43.png" alt="Company Logo" class="h-16 w-auto object-contain" onerror="this.style.display='none';">
                         <div>
                             <h1 class="text-3xl font-black text-slate-900 uppercase tracking-wider">Service Report</h1>
-                            <p class="text-slate-500 mt-1">Maintenance & Inspection Log</p>
+                            <p class="text-slate-500 font-medium">Maintenance & Inspection Log</p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="font-bold text-blue-800" id="display-client">Client Name</p>
-                        <p class="text-sm text-slate-600" id="display-interval">Interval</p>
+                        <p class="font-bold text-slate-800 text-xl" id="display-client">Client Name</p>
+                        <p class="font-bold text-blue-700" id="display-interval">Interval</p>
                     </div>
                 </div>
 
-                <!-- Form Inputs -->
                 <form id="maintenance-form" class="space-y-6" onsubmit="event.preventDefault();">
                     
                     <!-- Section 1: General Info -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 avoid-break bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div class="avoid-break bg-slate-50 p-4 rounded-lg border border-slate-200 pdf-fix-grid pdf-grid-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Site / Location</label>
-                            <input type="text" id="input-site" class="w-full p-1.5 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Site / Location</label>
+                            <input type="text" id="input-site" class="w-full p-2 font-semibold text-sm border border-slate-300 rounded focus:border-blue-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Utility</label>
-                            <select id="input-utility" class="w-full p-1.5 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Utility</label>
+                            <select id="input-utility" class="w-full p-2 font-semibold text-sm border border-slate-300 rounded focus:border-blue-500 outline-none">
                                 <option>Power Gen</option>
                                 <option>Compressor</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Service Date</label>
-                            <input type="date" id="input-date" class="w-full p-1.5 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Service Date</label>
+                            <input type="date" id="input-date" class="w-full p-2 font-semibold text-sm border border-slate-300 rounded focus:border-blue-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Engine Model</label>
-                            <input type="text" id="input-model" readonly class="w-full p-1.5 text-sm border border-slate-300 rounded bg-slate-100 text-slate-600 focus:outline-none">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Engine Model</label>
+                            <input type="text" id="input-model" readonly class="w-full p-2 font-bold text-sm border border-slate-300 rounded bg-slate-100 text-slate-700 outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Engine Serial Number</label>
-                            <input type="text" id="input-esn" readonly class="w-full p-1.5 text-sm border border-slate-300 rounded bg-slate-100 text-slate-600 focus:outline-none">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Engine Serial Number</label>
+                            <input type="text" id="input-esn" readonly class="w-full p-2 font-bold text-sm border border-slate-300 rounded bg-slate-100 text-slate-700 outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Running Hours</label>
-                            <input type="number" id="input-hours" placeholder="e.g. 4050" class="w-full p-1.5 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Running Hours</label>
+                            <input type="number" id="input-hours" placeholder="e.g. 4050" class="w-full p-2 font-semibold text-sm border border-slate-300 rounded focus:border-blue-500 outline-none">
                         </div>
                     </div>
 
                     <!-- Section 2: Measurements -->
-                    <div class="avoid-break border border-slate-300 rounded-lg p-4 bg-white shadow-sm">
-                        <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1 uppercase tracking-wide">Generator & Panel Measurements</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Load (KW)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Excitation Voltage (V)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Voltage (V)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">RPM</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Current L1, L2, L3</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Frequency (HZ)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Power Factor</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Load Signal</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">On/Off Load Values</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Actuator Voltage (V)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">PMG (V)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Magnetic Pickup Freq</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                    <div class="avoid-break border border-slate-300 rounded-lg overflow-hidden">
+                        <div class="bg-slate-100 p-2 border-b border-slate-300">
+                            <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wide ml-2">Generator & Panel Measurements</h3>
+                        </div>
+                        <div class="pdf-fix-grid pdf-grid-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+                            <div class="p-3 space-y-2">
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Load (KW)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Excitation (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Voltage (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">RPM</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                            </div>
+                            <div class="p-3 space-y-2">
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Current L1,L2,L3</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Frequency (HZ)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Power Factor</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Load Signal</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                            </div>
+                            <div class="p-3 space-y-2">
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">On/Off Load</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Actuator (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">PMG (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Mag Pickup Freq</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Section 3: Ohmic Values -->
-                    <div class="avoid-break border border-slate-300 rounded-lg p-4 bg-white shadow-sm">
-                        <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1 uppercase tracking-wide">Ohmic Values</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Charging Motor</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Shunt Trip</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Control Voltage</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Closing Relay</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">CT (A, B, C)</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Droop CT</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Anti Pump Relay</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Up</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Down</label><input type="text" class="w-24 text-xs p-1 outline-none border border-slate-200 rounded text-right"></div>
+                    <div class="avoid-break border border-slate-300 rounded-lg overflow-hidden">
+                        <div class="bg-slate-100 p-2 border-b border-slate-300">
+                            <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wide ml-2">Ohmic Values</h3>
+                        </div>
+                        <div class="pdf-fix-grid pdf-grid-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+                            <div class="p-3 space-y-2">
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Charging Motor</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Shunt Trip</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Control Voltage</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                            </div>
+                            <div class="p-3 space-y-2">
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Closing Relay</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">CT (A, B, C)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Droop CT</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                            </div>
+                            <div class="p-3 space-y-2">
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Anti Pump Relay</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Up</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                                <div class="flex justify-between items-end border-b border-dotted border-slate-300 pb-1"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Dwn</label><input type="text" class="w-20 text-xs font-bold text-right outline-none bg-transparent"></div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Section 4: Electrical Checklists -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="pdf-fix-grid pdf-grid-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                         
                         <!-- Panel & Terminals -->
-                        <div class="avoid-break bg-white border border-slate-300 p-4 rounded-lg shadow-sm">
-                            <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1">Gen. Panel & Terminal Checks</h3>
-                            <div class="space-y-1">
-                                <!-- Reusable checklist generator -->
+                        <div class="avoid-break border border-slate-300 rounded-lg overflow-hidden h-fit">
+                            <div class="bg-slate-100 p-2 border-b border-slate-300">
+                                <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wide ml-2">Gen. Panel & Terminals</h3>
+                            </div>
+                            <div class="p-3 space-y-1">
                                 <script>
                                     const panelItems = ['Control Panel Inspected', 'Wiring Inspected', 'Terminal Connection', 'Field Excitor MTG Bolts', 'Gen Lead Wire Connection', 'Circuit Breaker', 'Battery Connection', 'O.V. Relay', 'R.P Relay', 'HMI', 'Bus Bars', 'Meters', 'Inst. Transformers', 'AVR', 'GCB', 'D.C. Relays / Timers', 'PLC Term', 'Sockets', 'TDXM/Advantys'];
                                     panelItems.forEach(item => {
                                         document.write(`
-                                        <div class="flex items-center justify-between text-xs hover:bg-slate-50 p-1 rounded border-b border-slate-50">
-                                            <span class="text-slate-700">${item}</span>
-                                            <select class="border border-slate-200 rounded p-0.5 bg-transparent w-20 text-slate-600 focus:ring-1 outline-none"><option>-</option><option>OK</option><option>Adjusted</option><option>Replaced</option><option>N/A</option></select>
+                                        <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1">
+                                            <span class="text-slate-700 font-medium">${item}</span>
+                                            <select class="pdf-dropdown bg-slate-50 border border-slate-200 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
                                         </div>`);
                                     });
                                 </script>
                             </div>
                         </div>
 
-                        <!-- Engine & ESM -->
-                        <div class="avoid-break bg-white border border-slate-300 p-4 rounded-lg shadow-sm">
-                            <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1">Engine & ESM Checks</h3>
-                            <div class="space-y-1">
-                                <script>
-                                    const engineItems = ['Elect. Terminal TB-6', 'Elect. Starter Term.', 'Elect. Terminal TB-7', 'Ignition Harness & Plug', 'Control Harness & Plug', 'TCM', 'Main Reg. Filter', 'Timing Disk', 'Ignition Coils Term', 'AFM', 'Starter Bearing Lub.', 'Snubber', 'Emergency Switch', 'MPU CNR / CAM', 'P.D Box Connectors', 'Knock Sensor', 'RTD', 'Actuator Harness', 'Nox / Exhaust / O2 Sensor', 'Stepper Motors', 'FCV'];
-                                    engineItems.forEach(item => {
-                                        document.write(`
-                                        <div class="flex items-center justify-between text-xs hover:bg-slate-50 p-1 rounded border-b border-slate-50">
-                                            <span class="text-slate-700">${item}</span>
-                                            <select class="border border-slate-200 rounded p-0.5 bg-transparent w-20 text-slate-600 focus:ring-1 outline-none"><option>-</option><option>OK</option><option>Adjusted</option><option>Replaced</option><option>N/A</option></select>
-                                        </div>`);
-                                    });
-                                </script>
+                        <div class="flex flex-col gap-6">
+                            <!-- Engine & ESM -->
+                            <div class="avoid-break border border-slate-300 rounded-lg overflow-hidden">
+                                <div class="bg-slate-100 p-2 border-b border-slate-300">
+                                    <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wide ml-2">Engine & ESM Checks</h3>
+                                </div>
+                                <div class="p-3 space-y-1">
+                                    <script>
+                                        const engineItems = ['Elect. Terminal TB-6', 'Elect. Starter Term.', 'Elect. Terminal TB-7', 'Ignition Harness/Plug', 'Control Harness/Plug', 'TCM', 'Main Reg. Filter', 'Timing Disk', 'Ignition Coils Term', 'AFM', 'Starter Bearing Lub.', 'Snubber', 'Emergency Switch', 'MPU CNR / CAM', 'P.D Box Connectors', 'Knock Sensor', 'RTD', 'Actuator Harness', 'Nox / Exhaust / O2', 'Stepper Motors', 'FCV'];
+                                        engineItems.forEach(item => {
+                                            document.write(`
+                                            <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1">
+                                                <span class="text-slate-700 font-medium">${item}</span>
+                                                <select class="pdf-dropdown bg-slate-50 border border-slate-200 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
+                                            </div>`);
+                                        });
+                                    </script>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Compressor -->
-                        <div class="avoid-break bg-white border border-slate-300 p-4 rounded-lg shadow-sm">
-                            <h3 class="font-bold text-sm text-blue-800 mb-3 border-b border-slate-200 pb-1">Compressor Checks</h3>
-                            <div class="space-y-1">
-                                <script>
-                                    const compItems = ['Suction P-xudcer', 'Discharge P-Xudcer', 'Comp Oil Xducer', 'Re-Cycle Value', 'Re-cycle Value PID', 'Blowdown Value', 'Suction Scrubber Level', 'Discharge Scrubber Level', 'DNFT', 'Vibration'];
-                                    compItems.forEach(item => {
-                                        document.write(`
-                                        <div class="flex items-center justify-between text-xs hover:bg-slate-50 p-1 rounded border-b border-slate-50">
-                                            <span class="text-slate-700">${item}</span>
-                                            <select class="border border-slate-200 rounded p-0.5 bg-transparent w-20 text-slate-600 focus:ring-1 outline-none"><option>-</option><option>OK</option><option>Adjusted</option><option>Replaced</option><option>N/A</option></select>
-                                        </div>`);
-                                    });
-                                </script>
+                            <!-- Compressor -->
+                            <div class="avoid-break border border-slate-300 rounded-lg overflow-hidden">
+                                <div class="bg-slate-100 p-2 border-b border-slate-300">
+                                    <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wide ml-2">Compressor Checks</h3>
+                                </div>
+                                <div class="p-3 space-y-1">
+                                    <script>
+                                        const compItems = ['Suction P-xudcer', 'Discharge P-Xudcer', 'Comp Oil Xducer', 'Re-Cycle Value', 'Re-cycle Value PID', 'Blowdown Value', 'Suction Scrubber Level', 'Discharge Scrubber Level', 'DNFT', 'Vibration'];
+                                        compItems.forEach(item => {
+                                            document.write(`
+                                            <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1">
+                                                <span class="text-slate-700 font-medium">${item}</span>
+                                                <select class="pdf-dropdown bg-slate-50 border border-slate-200 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
+                                            </div>`);
+                                        });
+                                    </script>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Notes Section -->
-                    <div class="avoid-break border-t border-slate-200 pt-6">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Service Notes & Remarks</label>
-                        <textarea id="input-notes" rows="4" placeholder="Detail any issues found or parts replaced..." class="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                    <div class="avoid-break pt-4 border-t-2 border-slate-800">
+                        <label class="block text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Service Notes & Remarks</label>
+                        <textarea id="input-notes" rows="3" placeholder="Detail any issues found or parts replaced..." class="w-full p-3 border border-slate-300 rounded focus:border-blue-500 outline-none"></textarea>
                     </div>
 
                     <!-- Signatures -->
-                    <div class="avoid-break grid grid-cols-2 gap-8 pt-8 mt-8 border-t border-slate-200">
+                    <div class="avoid-break grid grid-cols-2 gap-12 pt-8">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-8">Lead Technician Name</label>
-                            <input type="text" class="w-full p-1 border-b border-slate-400 bg-transparent outline-none mb-2">
-                            <p class="text-xs font-semibold text-slate-500 text-center">Technician Signature</p>
+                            <input type="text" class="w-full p-1 border-b border-slate-400 bg-transparent outline-none font-bold text-slate-800 mb-1" placeholder="Print Name">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Lead Technician</p>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-8">Client Rep Name</label>
-                            <input type="text" class="w-full p-1 border-b border-slate-400 bg-transparent outline-none mb-2">
-                            <p class="text-xs font-semibold text-slate-500 text-center">Client Representative</p>
+                            <input type="text" class="w-full p-1 border-b border-slate-400 bg-transparent outline-none font-bold text-slate-800 mb-1" placeholder="Print Name">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Client Representative</p>
                         </div>
                     </div>
                 </form>
             </div>
 
-            <!-- Action Buttons (Hidden during PDF export) -->
+            <!-- Action Buttons -->
             <div id="action-buttons" class="mt-8 flex flex-col sm:flex-row gap-4 justify-between bg-slate-100 p-4 rounded-xl border border-slate-200">
                 <button onclick="showMaintenance()" class="px-6 py-3 bg-white text-slate-700 border border-slate-300 font-bold rounded-lg hover:bg-slate-50 flex items-center justify-center transition-colors">
                     <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Go Back
@@ -319,10 +354,7 @@
         lucide.createIcons();
 
         // --- DATA SETUP ---
-        // I have extracted sample data from your Excel file to make this functional immediately.
-        // You can add the rest of your fleet simply by copying this format.
         const fleetData = [
-            // Fauji Fertilizer (extracted from your file)
             { customer: "Fauji Fertilizer", model: "12V 275 GL + AFR2", esn: "5283704064" },
             { customer: "Fauji Fertilizer", model: "12V 275 GL + AFR2", esn: "5283704244" },
             { customer: "Fauji Fertilizer", model: "12V 275 GL + AFR2", esn: "5283704046" },
@@ -331,60 +363,29 @@
             { customer: "Fauji Fertilizer", model: "16V 275 GL + AFR2", esn: "3189237" },
             { customer: "Fauji Fertilizer", model: "16V 275 GL + AFR2", esn: "3189235" },
             { customer: "Fauji Fertilizer", model: "VHP L7042 GL", esn: "C-17883/1" },
-            
-            // OGDCL (Representing multiple sites as requested)
             { customer: "OGDCL (Nashpa)", model: "VHP L7042 GSI", esn: "OG-N-1001" },
             { customer: "OGDCL (Nashpa)", model: "VHP L7042 GSI", esn: "OG-N-1002" },
             { customer: "OGDCL (Qadirpur)", model: "VHP L5794 GSI", esn: "OG-Q-2001" },
             { customer: "OGDCL (Chanda)", model: "VHP L7044 GSI", esn: "OG-C-3001" },
-
-            // MOL
             { customer: "MOL", model: "VHP L7042 GSI", esn: "MOL-101" },
             { customer: "MOL", model: "VHP L5794 GSI", esn: "MOL-102" },
-
-            // MARI energi
             { customer: "MARI Energi", model: "VHP L7042 GSI", esn: "MARI-001" },
             { customer: "MARI Energi", model: "VHP L7044 GSI", esn: "MARI-002" },
-
-            // Tariq glass
             { customer: "Tariq Glass", model: "VHP L5794LTD", esn: "TG-5001" },
             { customer: "Tariq Glass", model: "VHP L5794LTD", esn: "TG-5002" }
         ];
 
-        // App State
-        let state = {
-            client: null,
-            engineModel: null,
-            esn: null,
-            interval: null
-        };
+        let state = { client: null, engineModel: null, esn: null, interval: null };
 
-        // --- UTILITY FUNCTIONS ---
         function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(el => {
-                el.classList.remove('active');
-            });
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             window.scrollTo(0,0);
         }
 
-        function updateBreadcrumb() {
-            let breadcrumbText = "Home";
-            if(state.client) breadcrumbText += ` > ${state.client}`;
-            if(state.esn) breadcrumbText += ` > ESN: ${state.esn}`;
-            document.getElementById('breadcrumb').innerText = breadcrumbText;
-        }
-
-        // --- NAVIGATION FUNCTIONS ---
-
-        // 1. Load Clients
         function goHome() {
             state = { client: null, engineModel: null, esn: null, interval: null };
-            updateBreadcrumb();
-            
-            // Get unique customers
             const clients = [...new Set(fleetData.map(item => item.customer))].sort();
-            
             const grid = document.getElementById('client-grid');
             grid.innerHTML = '';
             
@@ -401,20 +402,14 @@
                 `;
                 grid.appendChild(btn);
             });
-            
             lucide.createIcons();
             switchScreen('screen-clients');
         }
 
-        // 2. Select Client -> Show Engines (NOW BY ESN)
         function selectClient(clientName) {
             state.client = clientName;
-            updateBreadcrumb();
             document.getElementById('engine-subtitle').innerText = `Showing all engines installed at ${clientName}.`;
-            
-            // Filter data for this client to show EVERY specific engine
             const clientEngines = fleetData.filter(item => item.customer === clientName);
-
             const grid = document.getElementById('engine-grid');
             grid.innerHTML = '';
 
@@ -438,162 +433,125 @@
                 `;
                 grid.appendChild(btn);
             });
-
             lucide.createIcons();
             switchScreen('screen-engines');
         }
         
-        function showEngines() {
-            switchScreen('screen-engines');
-        }
-
-        // 3. Select Engine -> Show Maintenance Types
+        function showEngines() { switchScreen('screen-engines'); }
         function selectEngine(modelName, esn) {
             state.engineModel = modelName;
             state.esn = esn;
-            updateBreadcrumb();
             switchScreen('screen-maintenance');
         }
-        
-        function showMaintenance() {
-            switchScreen('screen-maintenance');
-        }
+        function showMaintenance() { switchScreen('screen-maintenance'); }
 
-        // 4. Select Maintenance -> Show Form
         function selectMaintenance(intervalType) {
             state.interval = intervalType;
-            
-            // Extract Site from Client Name if formatted as "Client (Site)"
             let clientStr = state.client;
-            let siteName = "";
-            let displayName = clientStr;
-            
-            if (clientStr.includes("(")) {
-                siteName = clientStr.match(/\(([^)]+)\)/)[1];
-                displayName = clientStr.split("(")[0].trim();
-            }
+            let siteName = clientStr.includes("(") ? clientStr.match(/\(([^)]+)\)/)[1] : "";
+            let displayName = clientStr.split("(")[0].trim();
 
-            // Populate Form Headers
             document.getElementById('display-client').innerText = displayName;
             document.getElementById('display-interval').innerText = state.interval;
-            
-            // Auto-fill Readonly inputs
             document.getElementById('input-site').value = siteName;
             document.getElementById('input-model').value = state.engineModel;
             document.getElementById('input-esn').value = state.esn;
-            
-            // Set today's date automatically
             document.getElementById('input-date').valueAsDate = new Date();
 
             switchScreen('screen-form');
         }
 
-        // 5. Generate PDF
+        // 5. GENERATE PDF (Fixes Applied)
         function downloadPDF() {
-            // FIX 1: Scroll to the very top to prevent the "blank first page" bug
-            window.scrollTo(0, 0);
-
+            window.scrollTo(0, 0); // Scroll to top
+            
             const element = document.getElementById('report-content');
             
-            // NEW FIX: Force a strict desktop width on the container to prevent squished columns in PDF
-            const originalWidth = element.style.width;
-            const originalMaxWidth = element.style.maxWidth;
-            element.style.width = '1000px';
-            element.style.maxWidth = '1000px';
-            element.classList.remove('shadow-lg', 'border', 'border-slate-200'); // Remove outer borders for clean PDF background
-            
-            // Temporarily style inputs to look like plain text for the PDF
+            // Save original styles to restore later
+            const originalStyles = {
+                width: element.style.width,
+                maxWidth: element.style.maxWidth,
+                position: element.style.position,
+                left: element.style.left,
+                top: element.style.top,
+                margin: element.style.margin,
+                transform: element.style.transform
+            };
+
+            // FIX: Force absolute positioning to top left & exact width. 
+            // This completely stops the "left side cut off" and "squished columns" bugs.
+            element.style.position = 'absolute';
+            element.style.left = '0';
+            element.style.top = '0';
+            element.style.margin = '0';
+            element.style.transform = 'none';
+            element.style.width = '800px'; 
+            element.style.maxWidth = '800px';
+            element.classList.remove('shadow-lg'); 
+
+            // Prepare inputs for clean printing
             const inputs = element.querySelectorAll('input, select, textarea');
             inputs.forEach(input => {
-                
-                // FIX 2: Lock the typed/selected values into the HTML so the PDF captures them correctly
-                if (input.tagName === 'INPUT') {
-                    input.setAttribute('value', input.value);
-                } else if (input.tagName === 'TEXTAREA') {
-                    input.innerHTML = input.value;
-                } else if (input.tagName === 'SELECT') {
+                // Lock values so the PDF engine sees them
+                if (input.tagName === 'INPUT') input.setAttribute('value', input.value);
+                else if (input.tagName === 'TEXTAREA') input.innerHTML = input.value;
+                else if (input.tagName === 'SELECT') {
                     const selected = input.options[input.selectedIndex];
                     if (selected) {
                         Array.from(input.options).forEach(opt => opt.removeAttribute('selected'));
                         selected.setAttribute('selected', 'selected');
                     }
                 }
-
-                input.dataset.originalBorder = input.style.border;
-                input.dataset.originalBg = input.style.backgroundColor;
                 
-                input.style.border = 'none';
-                input.style.backgroundColor = 'transparent';
-                
-                // For select elements, hide the dropdown arrow during PDF generation
-                if(input.tagName === 'SELECT') {
-                    input.classList.add('pdf-clean');
-                }
-                
-                if(input.tagName === 'TEXTAREA') {
-                    input.style.resize = 'none';
-                }
+                // Add the clean styling class
+                input.classList.add('pdf-clean');
+                if(input.tagName === 'TEXTAREA') input.style.resize = 'none';
             });
 
+            document.getElementById('action-buttons').style.display = 'none';
+
             const opt = {
-                margin:       [0.4, 0.4, 0.4, 0.4], // Strict top, right, bottom, left margins in inches
-                filename:     `Report_${state.client.replace(/\s+/g, '_')}_${state.esn.replace(/[^a-zA-Z0-9]/g, '')}_${new Date().toISOString().split('T')[0]}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
+                margin:       [0.4, 0.4, 0.4, 0.4], 
+                filename:     `Report_${state.client.replace(/\s+/g, '_')}_${state.esn.replace(/[^a-zA-Z0-9]/g, '')}.pdf`,
+                image:        { type: 'jpeg', quality: 1.0 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
                     allowTaint: true,
-                    windowWidth: 1024,
-                    scrollY: 0
+                    windowWidth: 800, // Match the exact forced width
+                    x: 0, // Force snapshot from exact top left
+                    y: 0
                 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                // NEW FIX: Use 'avoid-all' mode to completely prevent sections breaking in half across pages
-                pagebreak:    { mode: 'avoid-all', avoid: '.avoid-break' }
+                // Use 'css' pagebreak to strictly follow the avoid-break classes
+                pagebreak:    { mode: 'css', avoid: '.avoid-break' } 
             };
 
-            // Hide buttons
-            document.getElementById('action-buttons').style.display = 'none';
-
-            // Generate
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Restore UI after PDF generation
-                document.getElementById('action-buttons').style.display = 'flex';
-                
-                // Restore container layout after snapshot is done
-                element.style.width = originalWidth;
-                element.style.maxWidth = originalMaxWidth;
-                element.classList.add('shadow-lg', 'border', 'border-slate-200');
-
-                inputs.forEach(input => {
-                    input.style.border = input.dataset.originalBorder;
-                    input.style.backgroundColor = input.dataset.originalBg || '';
-                    if(input.tagName === 'SELECT') {
-                        input.classList.remove('pdf-clean');
-                    }
-                });
-            }).catch(error => {
-                // Catch any errors that happen during PDF generation to prevent unhandled rejection
-                console.error("Failed to generate PDF:", error);
-                
-                // Ensure UI is still restored if it fails
-                document.getElementById('action-buttons').style.display = 'flex';
-                element.style.width = originalWidth;
-                element.style.maxWidth = originalMaxWidth;
-                element.classList.add('shadow-lg', 'border', 'border-slate-200');
-
-                inputs.forEach(input => {
-                    input.style.border = input.dataset.originalBorder;
-                    input.style.backgroundColor = input.dataset.originalBg || '';
-                    if(input.tagName === 'SELECT') {
-                        input.classList.remove('pdf-clean');
-                    }
-                });
+            html2pdf().set(opt).from(element).save().then(() => restoreUI())
+            .catch(err => {
+                console.error("PDF Gen Error:", err);
+                restoreUI();
             });
+
+            function restoreUI() {
+                document.getElementById('action-buttons').style.display = 'flex';
+                
+                // Restore original container layout
+                element.style.width = originalStyles.width;
+                element.style.maxWidth = originalStyles.maxWidth;
+                element.style.position = originalStyles.position;
+                element.style.left = originalStyles.left;
+                element.style.top = originalStyles.top;
+                element.style.margin = originalStyles.margin;
+                element.style.transform = originalStyles.transform;
+                element.classList.add('shadow-lg');
+
+                // Restore inputs
+                inputs.forEach(input => input.classList.remove('pdf-clean'));
+            }
         }
 
-        // Initialize App on Load
         window.onload = goHome;
-
     </script>
 </body>
 </html>
