@@ -471,22 +471,16 @@
             const originalStyles = {
                 width: element.style.width,
                 maxWidth: element.style.maxWidth,
-                position: element.style.position,
-                left: element.style.left,
-                top: element.style.top,
                 margin: element.style.margin,
                 transform: element.style.transform
             };
 
-            // FIX: Force absolute positioning to top left & exact width. 
-            // This completely stops the "left side cut off" and "squished columns" bugs.
-            element.style.position = 'absolute';
-            element.style.left = '0';
-            element.style.top = '0';
-            element.style.margin = '0';
-            element.style.transform = 'none';
-            element.style.width = '800px'; 
-            element.style.maxWidth = '800px';
+            // FIX: Force width to prevent grid collapse, but DO NOT use absolute positioning.
+            // Keeping it in the document flow prevents the "blank page" rendering issue.
+            element.style.width = '1024px'; 
+            element.style.maxWidth = '1024px';
+            element.style.margin = '0 auto';
+            element.style.transform = 'none'; // Prevent animation transform bugs in html2canvas
             element.classList.remove('shadow-lg'); 
 
             // Prepare inputs for clean printing
@@ -518,9 +512,8 @@
                     scale: 2, 
                     useCORS: true,
                     allowTaint: true,
-                    windowWidth: 800, // Match the exact forced width
-                    x: 0, // Force snapshot from exact top left
-                    y: 0
+                    windowWidth: 1024, // Match the exact forced width
+                    scrollY: 0
                 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
                 // Use 'css' pagebreak to strictly follow the avoid-break classes
@@ -539,9 +532,6 @@
                 // Restore original container layout
                 element.style.width = originalStyles.width;
                 element.style.maxWidth = originalStyles.maxWidth;
-                element.style.position = originalStyles.position;
-                element.style.left = originalStyles.left;
-                element.style.top = originalStyles.top;
                 element.style.margin = originalStyles.margin;
                 element.style.transform = originalStyles.transform;
                 element.classList.add('shadow-lg');
