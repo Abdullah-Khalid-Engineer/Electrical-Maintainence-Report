@@ -72,12 +72,16 @@
         .pdf-mode textarea {
             overflow: hidden !important;
         }
+        /* Hide placeholders in PDF mode */
+        .pdf-mode input::placeholder {
+            color: transparent !important;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
 
     <!-- Top Navigation Bar -->
-    <nav class="bg-blue-800 text-white shadow-md p-4 sticky top-0 z-10">
+    <nav id="top-nav" class="bg-blue-800 text-white shadow-md p-4 sticky top-0 z-10">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3 font-bold text-xl cursor-pointer" onclick="goHome()">
                 <!-- Company Logo -->
@@ -90,7 +94,7 @@
     </nav>
 
     <!-- Main Content Area -->
-    <main class="max-w-5xl mx-auto p-4 sm:p-6 mt-4">
+    <main id="main-container" class="max-w-5xl mx-auto p-4 sm:p-6 mt-4">
 
         <!-- SCREEN 1: CLIENT SELECTION -->
         <div id="screen-clients" class="screen active">
@@ -218,23 +222,23 @@
                             <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wide ml-2">Generator & Panel Measurements</h3>
                         </div>
                         <div class="pdf-fix-grid pdf-grid-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
-                            <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Load (KW)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Excitation (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Voltage (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">RPM</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Load (KW)</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Excitation (V)</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Voltage (V)</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">RPM</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
                             </div>
-                            <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Current L1,L2,L3</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Frequency (HZ)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Power Factor</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Load Signal</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Current L1,L2,L3</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Frequency (HZ)</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Power Factor</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Load Signal</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
                             </div>
-                            <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">On/Off Load</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Actuator (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">PMG (V)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Mag Pickup Freq</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">On/Off Load</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Actuator (V)</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">PMG (V)</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Mag Pickup Freq</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
                             </div>
                         </div>
                     </div>
@@ -245,20 +249,20 @@
                             <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wide ml-2">Ohmic Values</h3>
                         </div>
                         <div class="pdf-fix-grid pdf-grid-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
-                            <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Charging Motor</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Shunt Trip</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Control Voltage</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Charging Motor</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Shunt Trip</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Control Voltage</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
                             </div>
-                            <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Closing Relay</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">CT (A, B, C)</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Droop CT</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Closing Relay</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">CT (A, B, C)</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Droop CT</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
                             </div>
-                            <div class="p-3 space-y-2">
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Anti Pump Relay</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Up</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
-                                <div class="flex justify-between items-center border-b border-dotted border-slate-300 pb-1 py-0.5"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Dwn</label><input type="text" class="w-20 text-xs font-bold text-right outline-none border border-slate-300 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Anti Pump Relay</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Up</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-2"><label class="text-xs font-semibold text-slate-600">Air Gap PMG Dwn</label><input type="text" placeholder="---" class="w-24 text-sm font-bold text-center text-blue-700 outline-none border border-slate-400 rounded p-1 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></div>
                             </div>
                         </div>
                     </div>
@@ -276,9 +280,9 @@
                                     const panelItems = ['Control Panel Inspected', 'Wiring Inspected', 'Terminal Connection', 'Field Excitor MTG Bolts', 'Gen Lead Wire Connection', 'Circuit Breaker', 'Battery Connection', 'O.V. Relay', 'R.P Relay', 'HMI', 'Bus Bars', 'Meters', 'Inst. Transformers', 'AVR', 'GCB', 'D.C. Relays / Timers', 'PLC Term', 'Sockets', 'TDXM/Advantys'];
                                     panelItems.forEach(item => {
                                         document.write(`
-                                        <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1">
+                                        <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1 pt-0.5">
                                             <span class="text-slate-700 font-medium">${item}</span>
-                                            <select class="pdf-dropdown bg-slate-50 border border-slate-200 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
+                                            <select class="pdf-dropdown bg-slate-50 border border-slate-300 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold cursor-pointer hover:border-blue-400"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
                                         </div>`);
                                     });
                                 </script>
@@ -296,9 +300,9 @@
                                         const engineItems = ['Elect. Terminal TB-6', 'Elect. Starter Term.', 'Elect. Terminal TB-7', 'Ignition Harness/Plug', 'Control Harness/Plug', 'TCM', 'Main Reg. Filter', 'Timing Disk', 'Ignition Coils Term', 'AFM', 'Starter Bearing Lub.', 'Snubber', 'Emergency Switch', 'MPU CNR / CAM', 'P.D Box Connectors', 'Knock Sensor', 'RTD', 'Actuator Harness', 'Nox / Exhaust / O2', 'Stepper Motors', 'FCV'];
                                         engineItems.forEach(item => {
                                             document.write(`
-                                            <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1">
+                                            <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1 pt-0.5">
                                                 <span class="text-slate-700 font-medium">${item}</span>
-                                                <select class="pdf-dropdown bg-slate-50 border border-slate-200 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
+                                                <select class="pdf-dropdown bg-slate-50 border border-slate-300 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold cursor-pointer hover:border-blue-400"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
                                             </div>`);
                                         });
                                     </script>
@@ -315,9 +319,9 @@
                                         const compItems = ['Suction P-xudcer', 'Discharge P-Xudcer', 'Comp Oil Xducer', 'Re-Cycle Value', 'Re-cycle Value PID', 'Blowdown Value', 'Suction Scrubber Level', 'Discharge Scrubber Level', 'DNFT', 'Vibration'];
                                         compItems.forEach(item => {
                                             document.write(`
-                                            <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1">
+                                            <div class="flex items-center justify-between text-xs border-b border-dotted border-slate-200 pb-1 pt-0.5">
                                                 <span class="text-slate-700 font-medium">${item}</span>
-                                                <select class="pdf-dropdown bg-slate-50 border border-slate-200 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
+                                                <select class="pdf-dropdown bg-slate-50 border border-slate-300 rounded p-0.5 w-20 text-slate-700 focus:ring-1 outline-none text-center font-semibold cursor-pointer hover:border-blue-400"><option>-</option><option>OK</option><option>Adj.</option><option>Repl.</option><option>N/A</option></select>
                                             </div>`);
                                         });
                                     </script>
@@ -477,30 +481,36 @@
             switchScreen('screen-form');
         }
 
-        // 5. LIVE ELEMENT PDF EXPORT (Fixes Blank PDF issue)
+        // 5. BULLETPROOF PDF EXPORT - Fixes the "Shifted left / Cut-off" glitch
         function downloadPDF() {
-            // Scroll to top so html2canvas doesn't clip the top of the document
+            // Scroll to 0,0 first so we aren't halfway down the page
             window.scrollTo(0, 0); 
             
             const element = document.getElementById('report-content');
+            const mainContainer = document.getElementById('main-container');
+            const navBar = document.getElementById('top-nav');
             
-            // Save original styles to safely restore them after export
+            // Save original styles to restore them perfectly
+            const origMainClass = mainContainer.className;
             const originalStyles = {
                 width: element.style.width,
                 maxWidth: element.style.maxWidth,
                 margin: element.style.margin,
-                boxShadow: element.style.boxShadow
             };
 
-            // Force strict dimensions on the live element to perfectly align with A4 width
-            // Keeping it in the regular document flow stops the "blank PDF" bug entirely.
+            // THE FIX: We temporarily hide the nav bar and strip all margins/padding 
+            // from the main container. This forces the report to sit perfectly flush 
+            // at coordinates (0,0) of your browser window. When html2canvas takes the 
+            // screenshot from 0,0, it captures it perfectly without getting shifted left.
+            navBar.style.display = 'none';
+            mainContainer.className = ""; 
+            
             element.style.width = '800px'; 
             element.style.maxWidth = '800px';
-            element.style.margin = '0 auto';
-            element.style.boxShadow = 'none';
+            element.style.margin = '0'; // Snap tight to the left
             element.classList.add('pdf-mode'); 
             
-            // Sync all user inputs into their HTML attributes so the PDF engine can "see" them
+            // Lock all form values into the HTML before generating
             const inputs = element.querySelectorAll('input, select, textarea');
             inputs.forEach(input => {
                 if (input.tagName === 'INPUT') {
@@ -523,17 +533,20 @@
             document.getElementById('action-buttons').style.display = 'none';
             if (window.lucide) lucide.createIcons();
 
-            // Setup perfectly-aligned A4 margins
+            // Set specific margins for the A4 output
             const opt = {
-                margin:       [0.4, 0.4, 0.4, 0.4], 
+                margin:       [0.5, 0.4, 0.5, 0.4], 
                 filename:     `Report_${state.client.replace(/\s+/g, '_')}_${state.esn.replace(/[^a-zA-Z0-9]/g, '')}.pdf`,
                 image:        { type: 'jpeg', quality: 1.0 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
                     allowTaint: true,
-                    windowWidth: 800, // Explicitly match the container width so columns never squish
-                    scrollY: 0
+                    windowWidth: 800, // Forces the capture to stop at exactly 800px wide
+                    scrollX: 0,
+                    scrollY: 0,
+                    x: 0, // Forces the capture to start exactly at the absolute left
+                    y: 0  // Forces the capture to start exactly at the absolute top
                 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: 'css', avoid: '.avoid-break' } 
@@ -547,12 +560,14 @@
             });
 
             function restoreUI() {
-                // Return everything to normal
+                // Return everything exactly back to normal
+                navBar.style.display = 'flex';
+                mainContainer.className = origMainClass;
                 document.getElementById('action-buttons').style.display = 'flex';
+                
                 element.style.width = originalStyles.width;
                 element.style.maxWidth = originalStyles.maxWidth;
                 element.style.margin = originalStyles.margin;
-                element.style.boxShadow = originalStyles.boxShadow;
                 element.classList.remove('pdf-mode');
                 
                 btn.innerHTML = originalBtnHtml;
