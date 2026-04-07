@@ -125,6 +125,15 @@
                 <h1 class="text-2xl font-bold text-slate-800 mb-2">Select a Client</h1>
                 <p class="text-slate-500">Choose a customer to view their installed engine fleet.</p>
             </div>
+            
+            <!-- Client Search Bar -->
+            <div class="mb-6 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
+                </div>
+                <input type="text" id="search-clients" oninput="filterClients()" placeholder="Search clients..." class="w-full pl-10 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm">
+            </div>
+
             <div id="client-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <!-- Buttons injected by JS -->
             </div>
@@ -139,6 +148,15 @@
                 <h1 class="text-2xl font-bold text-slate-800 mb-2">Select Engine (by Serial Number)</h1>
                 <p class="text-slate-500" id="engine-subtitle">Showing all engines installed for Client.</p>
             </div>
+
+            <!-- Engine Search Bar -->
+            <div class="mb-6 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
+                </div>
+                <input type="text" id="search-engines" oninput="filterEngines()" placeholder="Search by model or serial number..." class="w-full pl-10 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm">
+            </div>
+
             <div id="engine-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <!-- Buttons injected by JS -->
             </div>
@@ -426,8 +444,30 @@
             window.scrollTo(0,0);
         }
 
+        // --- SEARCH FUNCTIONS ---
+        function filterClients() {
+            const query = document.getElementById('search-clients').value.toLowerCase();
+            const buttons = document.getElementById('client-grid').getElementsByTagName('button');
+            Array.from(buttons).forEach(btn => {
+                btn.style.display = btn.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        function filterEngines() {
+            const query = document.getElementById('search-engines').value.toLowerCase();
+            const buttons = document.getElementById('engine-grid').getElementsByTagName('button');
+            Array.from(buttons).forEach(btn => {
+                btn.style.display = btn.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+            });
+        }
+
         function goHome() {
             state = { client: null, engineModel: null, esn: null, interval: null };
+            
+            // Clear search fields
+            if(document.getElementById('search-clients')) document.getElementById('search-clients').value = '';
+            if(document.getElementById('search-engines')) document.getElementById('search-engines').value = '';
+
             const clients = [...new Set(fleetData.map(item => item.customer))].sort();
             const grid = document.getElementById('client-grid');
             grid.innerHTML = '';
@@ -452,6 +492,10 @@
         function selectClient(clientName) {
             state.client = clientName;
             document.getElementById('engine-subtitle').innerText = `Showing all engines installed at ${clientName}.`;
+            
+            // Clear engine search when loading a new client
+            if(document.getElementById('search-engines')) document.getElementById('search-engines').value = '';
+
             const clientEngines = fleetData.filter(item => item.customer === clientName);
             const grid = document.getElementById('engine-grid');
             grid.innerHTML = '';
